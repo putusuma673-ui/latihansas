@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Game Matematika SMP</title>
+<style>
+body{font-family:Arial;background:#e0eaff;padding:15px;margin:0}
+.container{max-width:700px;background:white;margin:20px auto;padding:25px;border-radius:18px}
+header{background:#172554;color:white;padding:20px;text-align:center;border-radius:12px}
+button{background:#2563eb;color:white;border:0;padding:14px;border-radius:10px;width:100%;font-size:16px;cursor:pointer;margin-top:12px}
+button:disabled{opacity:.5}
+.option{display:block;padding:14px;border:1px solid #bbb;border-radius:10px;margin:10px 0;cursor:pointer}
+.option:hover{background:#eff6ff}
+.info{display:flex;justify-content:space-between;margin:20px 0}
+#question{font-size:18px;line-height:1.5}
+.feedback{padding:15px;margin-top:15px;border-radius:10px;background:#dcfce7}
+.wrong{background:#fee2e2}
+.bar{height:9px;background:#22c55e;width:0%;border-radius:10px}
+.progress{background:#ddd;border-radius:10px}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>🎯 GAME MATEMATIKA</h1>
+<p>Tantangan 20 Soal SMP</p>
+</header>
+<div class="info">
+<b id="nomor">Soal 1/20</b>
+<b>Skor: <span id="score">0</span></b>
+</div>
+<div class="progress"><div class="bar" id="bar"></div></div>
+<div id="game">
+<h3 id="materi"></h3>
+<p id="question"></p>
+<div id="options"></div>
+<div id="feedback"></div>
+<button id="check" disabled onclick="periksa()">PERIKSA JAWABAN</button>
+</div>
+<div id="result"></div>
+</div>
+<script>
+const soal=[
+["SPLDV","2 buku dan 3 pensil Rp19.000. Satu buku dan 2 pensil Rp11.000. Harga satu buku?",["Rp4.000","Rp5.000","Rp6.000","Rp7.000"],1,"Diperoleh harga buku Rp5.000 dan pensil Rp3.000."],
+["SPLDV","Jumlah umur Andi dan Budi 30 tahun. Andi 4 tahun lebih tua. Umur Andi?",["13","15","17","19"],2,"A+B=30 dan A-B=4, sehingga A=17."],
+["SPLDV","3 roti dan 2 susu Rp21.000. 2 roti dan 1 susu Rp13.000. Harga satu roti dan satu susu?",["Rp8.000","Rp9.000","Rp10.000","Rp11.000"],0,"Roti Rp5.000 dan susu Rp3.000. Total Rp8.000."],
+["SPLDV","Jika 2x+y=13 dan x-y=2, nilai x+y adalah?",["6","7","8","9"],2,"Diperoleh x=5 dan y=3. Jadi 8."],
+["Unsur Lingkaran","Garis melalui pusat yang menghubungkan dua titik lingkaran disebut?",["Busur","Tali busur","Diameter","Apotema"],2,"Diameter adalah tali busur yang melalui pusat."],
+["Unsur Lingkaran","Garis dari pusat yang tegak lurus tali busur disebut?",["Jari-jari","Apotema","Busur","Diameter"],1,"Apotema adalah garis tegak lurus dari pusat ke tali busur."],
+["Unsur Lingkaran","Daerah yang dibatasi dua jari-jari dan sebuah busur disebut?",["Tembereng","Juring","Diameter","Apotema"],1,"Daerah tersebut disebut juring."],
+["Keliling Lingkaran","Jari-jari lingkaran 7 cm. Kelilingnya (π=22/7)?",["22 cm","44 cm","154 cm","49 cm"],1,"K=2πr=44 cm."],
+["Luas Lingkaran","Diameter taman 28 m. Luas taman (π=22/7)?",["308 m²","528 m²","616 m²","1.232 m²"],2,"r=14 m. Luas=πr²=616 m²."],
+["Sudut Dalam","Sudut A segi empat tali busur 110°. Sudut C?",["60°","70°","80°","110°"],1,"Sudut berhadapan berjumlah 180°."],
+["Sudut Luar","Sudut luar segi empat tali busur 65°. Sudut dalam berhadapan?",["55°","65°","115°","125°"],1,"Sudut luar sama dengan sudut dalam yang berhadapan."],
+["Sudut Pusat","Sudut pusat 100°. Sudut keliling pada busur yang sama?",["25°","50°","100°","200°"],1,"Sudut keliling setengah sudut pusat."],
+["Panjang Busur","r=14 cm dan sudut pusat 90°. Panjang busur (π=22/7)?",["11 cm","22 cm","44 cm","88 cm"],1,"Panjang busur=90/360×2πr=22 cm."],
+["Luas Juring","r=14 cm dan sudut pusat 90°. Luas juring?",["77 cm²","154 cm²","308 cm²","616 cm²"],1,"Luas juring=90/360×π×14²=154 cm²."],
+["Luas Tembereng","r=14 cm, sudut pusat 90°. Luas tembereng kecil?",["42 cm²","56 cm²","98 cm²","154 cm²"],1,"Luas juring 154 dikurangi luas segitiga 98 = 56 cm²."],
+["Tabung","Tabung r=7 cm dan tinggi 10 cm. Volumenya?",["770 cm³","1.540 cm³","2.200 cm³","3.080 cm³"],1,"V=πr²t=1.540 cm³."],
+["Tabung","Tabung tertutup r=7 cm dan tinggi 10 cm. Luas permukaan?",["374 cm²","440 cm²","748 cm²","880 cm²"],2,"L=2πr(r+t)=748 cm²."],
+["Kerucut","Kerucut r=3 cm dan tinggi 4 cm. Volume (π=3,14)?",["12,56 cm³","28,26 cm³","37,68 cm³","113,04 cm³"],2,"V=1/3×π×r²×t=37,68 cm³."],
+["Bola","Bola r=7 cm. Luas permukaannya?",["154 cm²","308 cm²","462 cm²","616 cm²"],3,"L=4πr²=616 cm²."],
+["Setengah Bola","Setengah bola padat r=7 m. Luas seluruh permukaan termasuk alas?",["154 m²","308 m²","462 m²","616 m²"],2,"L=3πr²=462 m²."]
+];
+let n=0,skor=0,pilih=null,cek=false;
+const $=id=>document.getElementById(id);
+function tampil(){
+ let s=soal[n];pilih=null;cek=false;
+ $("materi").textContent=s[0];
+ $("nomor").textContent=`Soal ${n+1}/20`;
+ $("score").textContent=skor*5;
+ $("bar").style.width=n*5+"%";
+ $("question").textContent=s[1];
+ $("feedback").innerHTML="";
+ $("check").disabled=true;
+ $("check").textContent="PERIKSA JAWABAN";
+ $("options").innerHTML=s[2].map((v,i)=>`
+ <label class="option">
+ <input type="radio" name="j" value="${i}" onchange="pilihJawaban(${i})">
+ ${"ABCD"[i]}. ${v}
+ </label>`).join("");
+}
+function pilihJawaban(i){if(!cek){pilih=i;$("check").disabled=false;}}
+function periksa(){
+ if(!cek){
+  if(pilih===null)return;
+  cek=true;
+  let s=soal[n],benar=pilih===s[3];
+  if(benar)skor++;
+  $("score").textContent=skor*5;
+  $("feedback").className="feedback "+(benar?"":"wrong");
+  $("feedback").innerHTML=`<b>${benar?"✓ BENAR":"✗ BELUM TEPAT"}</b><p>Jawaban: ${"ABCD"[s[3]]}. ${s[2][s[3]]}</p><p>${s[4]}</p>`;
+  document.querySelectorAll('input[name="j"]').forEach(x=>x.disabled=true);
+  $("check").textContent=n===19?"HASIL AKHIR":"SOAL BERIKUTNYA";
+ }else{
+  if(n<19){n++;tampil();}else{selesai();}
+ }
+}
+function selesai(){
+ $("game").innerHTML="";
+ $("bar").style.width="100%";
+ let pred=skor>=18?"Sangat Baik":skor>=15?"Baik":skor>=12?"Cukup":skor>=10?"Perlu Latihan":"Perlu Bimbingan";
+ $("result").innerHTML=`<h2>🏆 GAME SELESAI</h2><h1>${skor*5}/100</h1><h3>${pred}</h3><p>Benar ${skor} dari 20 soal.</p><button onclick="location.reload()">MAIN LAGI</button>`;
+}
+tampil();
+</script>
+</body>
+</html>
